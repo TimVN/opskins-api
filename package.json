@@ -1,0 +1,19 @@
+{
+  "name": "opskins-api",
+  "version": "1.0.6",
+  "description": "Module used to interact with the OPSkins API",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js test"
+  },
+  "keywords": [
+    "opskins",
+    "api"
+  ],
+  "author": "Tim van Norde",
+  "license": "ISC",
+  "dependencies": {
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
+  }
+}
