@@ -4,19 +4,13 @@ npm i opskins-api
 
 #Categories#
 
-[Cashout](#cashout-methods)
-
-[Inventory](#inventory-methods)
-
-[Pricing](#pricing-methods)
-
-[Sales](#sales-methods)
-
-[Status](#status-methods)
-
-[Support](#support-methods)
-
-[User](#user-methods)
+ * [Cashout](#cashout-methods)
+ * [Inventory](#inventory-methods)
+ * [Pricing](#pricing-methods)
+ * [Sales](#sales-methods)
+ * [Status](#status-methods)
+ * [Support](#support-methods)
+ * [User](#user-methods)
 
 #Methods
 ##<a name='cashout-methods'>Cashout</a>
