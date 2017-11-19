@@ -15,7 +15,7 @@ npm i opskins-api
  * [User](#user-methods)
 
 #Methods
-##<a name='cashout-methods'>Cashout</a>
+## <a name='cashout-methods'>Cashout</a>
 
 !! These methods are used accessing the 'Cashout' property !!
 
@@ -45,7 +45,7 @@ Output:
  * `can_change` A boolean indicating whether you can change this address by calling SetAddress again right now
  * `change_requires_twofactor` A boolean indicating whether you will need to provide a two-factor code to change this address
  
-##<a name='GetPendingCashouts'>GetPendingCashouts()</a>
+## <a name='GetPendingCashouts'>GetPendingCashouts()</a>
 
 Output:
  
@@ -57,7 +57,7 @@ Output:
  * `processor` The ID of the processor which this cashout will be sent via
  * `priority` A boolean indicating whether this is a priority cashout (which will incur extra fees)
  
-##<a name='CancelPendingCashout'>CancelPendingCashout(`int` cashoutId)</a>
+## <a name='CancelPendingCashout'>CancelPendingCashout(`int` cashoutId)</a>
 
 Input:
 
@@ -65,13 +65,13 @@ Input:
 
 Outputs nothing
 
-##<a name='GetBitcoinInstantCashoutRate'>GetBitcoinInstantCashoutRate()</a>
+## <a name='GetBitcoinInstantCashoutRate'>GetBitcoinInstantCashoutRate()</a>
 
 Output:
 
  * `usd_rate` The price per 1 BTC, in USD (dollars, not cents)
 
-##<a name='RequestPayPal'>RequestPayPal(`int` amount, `int` priority)</a>
+## <a name='RequestPayPal'>RequestPayPal(`int` amount, `int` priority)</a>
 
 Input:
 
@@ -84,7 +84,7 @@ Output:
  * `cashoutid` The ID of the newly-created cashout request
  * `priority` A boolean indicating whether this cashout request is for a priority cashout
  
-##<a name='RequestBitcoin'>RequestBitcoin(`int` amount, `int` priority)</a>
+## <a name='RequestBitcoin'>RequestBitcoin(`int` amount, `int` priority)</a>
 
 Input:
 
@@ -99,7 +99,7 @@ Output:
  * `bitcoin_txn_id` Only present if this was an instant cashout. This is the Bitcoin transaction ID (which is a hex-string hash) which was just paid to you
  * `bitcoin_amount_satoshis` Only present if this was an instant cashout. This is the amount of BTC you received, in satoshis (0.00000001 BTC)
  
-##<a name='RequestSkrill'>RequestSkrill(`int` amount)</a>
+## <a name='RequestSkrill'>RequestSkrill(`int` amount)</a>
 
 Input:
 
@@ -113,7 +113,7 @@ Output:
  * `skrill_txn_status` An integer representing the status of the Skrill payment transaction (see Skrill's documentation)
  * `skrill_txn_status_msg` A string representing the status of the Skrill payment transaction (see Skrill's documentation)
  
-##<a name='GetCashoutableBalance'>GetCashoutableBalance()</a>
+## <a name='GetCashoutableBalance'>GetCashoutableBalance()</a>
 
 Output:
 
@@ -122,7 +122,7 @@ Output:
  * `deposited_balance` How much of your balance was deposited through a payment provider, in USD cents. This amount cannot be cashed out.
  * `cashoutable_balance` The total amount of money you have that can be cashed out, in USD cents. This is your `total_balance` minus your `pending_cashout_balance` and your `deposited_balance`
  
-##<a name='inventory-methods'>Inventory</a>
+## <a name='inventory-methods'>Inventory</a>
 
 !! These methods are used accessing the 'Inventory' property !!
 
@@ -132,7 +132,7 @@ Example:
         console.log(data);
     });
 
-##<a name='GetInventory'>GetInventory(`int` page, `int` per_page)</a>
+## <a name='GetInventory'>GetInventory(`int` page, `int` per_page)</a>
 
 Input:
 
@@ -153,7 +153,7 @@ Output:
     * `requires_support` If this item has a problem and requires support intervention before it can be withdrawn or relisted, this is true.
     * `can_repair` If this item requires support but you can attempt to self-repair it, this is true.
     
-##<a name='Withdraw'>Withdraw(`string` items)</a>
+## <a name='Withdraw'>Withdraw(`string` items)</a>
 
 Input:
 
@@ -167,7 +167,7 @@ Output:
     * `tradeoffer_error` If we were not able to send a trade offer, this is a string containing an error message. If no error, this is null.
     * `items` An array of OPSkins item IDs in this trade offer
     
-##<a name='Deposit'>Deposit(`string` items)</a>
+## <a name='Deposit'>Deposit(`string` items)</a>
 
 Add between 1 and 50 items (upper cap subject to change) to your On-Site Inventory. This will fail if any of the items passed in already have sales with active trade offers out. If there's a matching sale for an item that doesn't have a trade offer out, it will automatically be deleted. This works identically to ISales/ListItems/v1 minus the price and addons parameters.
 
@@ -194,7 +194,7 @@ Output:
      * `price` The list price of this item in USD cents (typically set to $99,999.99)
      * `addons` An array containing strings for each addon this item has
      
-##<a name='pricing-methods'>Pricing</a>
+## <a name='pricing-methods'>Pricing</a>
 
 !! These methods are used accessing the 'Pricing' property !!
 
@@ -204,7 +204,7 @@ Example:
         console.log(data);
     });
     
-##<a name='GetPriceList'>GetPriceList(`int` appid)</a>
+## <a name='GetPriceList'>GetPriceList(`int` appid)</a>
 
 Input:
 
@@ -224,7 +224,7 @@ Output:
 
 The output of this method is cached by OPSkins' CDN. Therefore, the timestamp is most likely not going to be accurate. This list updates nightly at or around midnight server time (Eastern United States timezone).
 
-##<a name='GetAllLowestListPrices'>GetAllLowestListPrices(`int` appid)</a>
+## <a name='GetAllLowestListPrices'>GetAllLowestListPrices(`int` appid)</a>
 
 Input:
 
@@ -239,7 +239,7 @@ Output:
    
 The proper way to interpret an entry is "quantity currently on sale, starting at price".
 
-##<a name='sales-methods'>Sales</a>
+## <a name='sales-methods'>Sales</a>
 
 !! These methods are used accessing the 'Sales' property !!
 
@@ -249,7 +249,7 @@ Example:
         console.log(data);
     });
     
-##<a name='GetSales'>GetSales(`object` options)</a>
+## <a name='GetSales'>GetSales(`object` options)</a>
 
 Gets a list of item sales for your account. This endpoint is paginated, and will return up to `per_page` (Default: 10,000) results per page.
 
@@ -330,7 +330,7 @@ Output:
  * `private` - The item has been listed privately
  * `screenshots` - The item has an Instant Field Inspection
  
-##<a name='GetListingLimit'>GetListingLimit()</a>
+## <a name='GetListingLimit'>GetListingLimit()</a>
 
 Get the current limit of how many items you can list for sale in one request. This limit is subject to change periodically (usually it only goes up, but it is possible that we may need to decrease it at some point). This is not an account-based listing limit; this is only a limit on how many items can be listed in one sale queue (via the website) or one call to ListItems (via the API).
 
@@ -338,7 +338,7 @@ Output:
 
  * `listing_limit` The current listing limit
  
-##<a name='ListItems'>ListItems(`array` items)</a>
+## <a name='ListItems'>ListItems(`array` items)</a>
 
 Lists between 1 and 50 items for sale (upper cap subject to change). This will fail if any of the items passed in already have sales with active trade offers out. If there's a matching sale for an item that doesn't have a trade offer out, it will automatically be deleted.
 
@@ -392,7 +392,7 @@ json error GENERIC_USER_ACCOUNT_ERROR:
       "message": "Please go to your account page and set your Trade URL before attempting to list items."
     }
      
-##<a name='EditPrice'>EditPrice(`int` saleid, `int` price)</a>
+## <a name='EditPrice'>EditPrice(`int` saleid, `int` price)</a>
 
 Edits the price of an item you currently have listed. If the item is in your OPSkins inventory, it lists it for sale.
 
@@ -405,7 +405,7 @@ Output:
 
  * `relisted` true if the item was in your OPSkins inventory and has been re-listed, or false if it was already listed and its price has simply been edited.
  
-##Errors
+## Errors
 
  * `NOT_FOUND` The requested sale ID does not exist or doesn't belong to you
  * `BAD_STATE` The requested sale ID is not currently on sale or in your OPSkins inventory, or it's in a bad state that requires support intervention or repair
@@ -430,7 +430,7 @@ Other possible error responses with corresponding status codes:
     4000 STEAM_UNAVAILABLE
     3008 RATE_LIMIT_EXCEEDED
     
-##<a name='EditPriceMulti'>EditPriceMulti(`object` items)</a>
+## <a name='EditPriceMulti'>EditPriceMulti(`object` items)</a>
 
 Queue price updates for up to 500 items. On success, this method will return an HTTP 202 Accepted status code and will respond immediately. The actual price updates will be queued and will be processed in the background. This will fail if you attempt to queue a price update for an item which already has a queued price update. Price update errors will not be reported and will be silently dropped in the background. For example, requests to edit the prices of items you do not own or which do not exist will be accepted, but will not actually be processed.
 
@@ -444,7 +444,7 @@ Example:
     
 Outputs nothing
 
-##Errors
+## Errors
 
 json error response RATE_LIMIT_EXCEEDED
 
@@ -467,7 +467,7 @@ json error response BAD_STATE
       "message": "Item 1000 already has a price update queued. Its new price will be 1000"
     }
 
-##<a name='BumpItems'>BumpItems(`array` items)</a>
+## <a name='BumpItems'>BumpItems(`array` items)</a>
 
 Bump one or more items you've listed for sale to the top of the browse page and the featured (default) sort for search. Will cost $0.50 per item, but will use any free bump credits you may have (e.g. from a premium membership) first.
 
@@ -513,7 +513,7 @@ json error response GENERIC_INTERNAL_ERROR
       "message": "An unknown error occurred"
     }
     
-##<a name='ReturnItems'>ReturnItems(`array` items)</a>
+## <a name='ReturnItems'>ReturnItems(`array` items)</a>
 
 Return one or more items you've listed for sale to your Steam accounts. Input items must be either on sale or awaiting return, and must not have an active trade offer out or queued. Under most circumstances, a trade offer won't be queued, but it's possible if, for example, you request that an item be returned and the bot is offline at the time of request.
 
