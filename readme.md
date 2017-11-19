@@ -251,6 +251,8 @@ Example:
     
 ##<a name='GetSales'>GetSales(`object` options)</a>
 
+Gets a list of item sales for your account. This endpoint is paginated, and will return up to `per_page` (Default: 10,000) results per page.
+
 Because `options` can contain a bunch of optional parameters, it is an object, pass it as such:
 
     {
@@ -336,7 +338,7 @@ Output:
 
  * `listing_limit` The current listing limit
  
-##<a name='ListItems'>ListItems()</a>
+##<a name='ListItems'>ListItems(`array` items)</a>
 
 Lists between 1 and 50 items for sale (upper cap subject to change). This will fail if any of the items passed in already have sales with active trade offers out. If there's a matching sale for an item that doesn't have a trade offer out, it will automatically be deleted.
 
@@ -367,7 +369,30 @@ Output:
      * `price` The list price of this item in USD cents
      * `addons` An array containing strings for each addon this item has
      
-##<a name='EditPrice'>EditPrice()</a>
+#Errors
+     
+json error BAD_INPUT:
+
+    {
+      "status": 3000,
+      "message": "'items' must be a JSON array of objects"
+    }
+    
+json error ACCESS_DENIED:
+
+    {
+      "status": 1002,
+      "message": "You may not list items for sale while you are under the age of 18."
+    }
+    
+json error GENERIC_USER_ACCOUNT_ERROR:
+
+    {
+      "status": 1000,
+      "message": "Please go to your account page and set your Trade URL before attempting to list items."
+    }
+     
+##<a name='EditPrice'>EditPrice(`int` saleid, `int` price)</a>
 
 Edits the price of an item you currently have listed. If the item is in your OPSkins inventory, it lists it for sale.
 
@@ -380,4 +405,197 @@ Output:
 
  * `relisted` true if the item was in your OPSkins inventory and has been re-listed, or false if it was already listed and its price has simply been edited.
  
- ###Errors
+##Errors
+
+ * `NOT_FOUND` The requested sale ID does not exist or doesn't belong to you
+ * `BAD_STATE` The requested sale ID is not currently on sale or in your OPSkins inventory, or it's in a bad state that requires support intervention or repair
+ * `UNACCEPTABLE_PRICE` Your requested price is outside the acceptable range for all items, or the item has pricing restrictions on it and your price violates those restrictions
+ * `ALREADY_IN_THAT_STATE` The item is already for sale for the requested price
+ * `STEAM_UNAVAILABLE` When you re-list an inventory item, we grab the Steam inventory to make sure it's still there. If you're re-listing and Steam inventories are down, you get this error code.
+ * `RATE_LIMIT_EXCEEDED` You can only edit the price of an item 10 times per day. You'll get this code if you try to edit it more than that many times.
+ 
+json error if no matching sale was found
+
+    {
+      "status": 2002,
+      "message": "No matching sale was found."
+    }
+    
+Other possible error responses with corresponding status codes:
+
+    2002 NOT_FOUND
+    2003 BAD_STATE
+    3003 UNACCEPTABLE_PRICE
+    2012 ALREADY_IN_THAT_STATE
+    4000 STEAM_UNAVAILABLE
+    3008 RATE_LIMIT_EXCEEDED
+    
+##<a name='EditPriceMulti'>EditPriceMulti(`object` items)</a>
+
+Queue price updates for up to 500 items. On success, this method will return an HTTP 202 Accepted status code and will respond immediately. The actual price updates will be queued and will be processed in the background. This will fail if you attempt to queue a price update for an item which already has a queued price update. Price update errors will not be reported and will be silently dropped in the background. For example, requests to edit the prices of items you do not own or which do not exist will be accepted, but will not actually be processed.
+
+Input:
+
+ * `items` And object where the keys are the OPSkins sale IDs and the values are new prices in USD cents.
+ 
+Example:
+
+    OPSkins.Sales.EditPriceMulti({ 1000: 500 });
+    
+Outputs nothing
+
+##Errors
+
+json error response RATE_LIMIT_EXCEEDED
+
+    {
+      "status": 3008,
+      "message": "Another EditPriceMulti request is currently processing. Please wait for it to be accepted."
+    }
+
+json error response BAD_INPUT
+
+    {
+      "status": 3000,
+      "message": "\"items\" must be in format items[itemid]=price"
+    }
+
+json error response BAD_STATE
+
+    {
+      "status": 2003,
+      "message": "Item 1000 already has a price update queued. Its new price will be 1000"
+    }
+
+##<a name='BumpItems'>BumpItems(`array` items)</a>
+
+Bump one or more items you've listed for sale to the top of the browse page and the featured (default) sort for search. Will cost $0.50 per item, but will use any free bump credits you may have (e.g. from a premium membership) first.
+
+It is possible for bumping to fail for some items in this batch and to succeed for others.
+
+The top-level `balance` property will be present in this method's response, containing your up-to-date account balance.
+
+Input:
+
+ * `items` An array of sale IDs of items you want to bump
+ 
+Output:
+
+ * `sales` An object whose keys are sale IDs and values are objects of the following structure:
+     * `status` An ErrorCode value representing the status of the bump request for this item. Will be 1 (OK) on success.
+     * `message` A string containing an error message, or "OK" on success.
+     
+#Errors
+
+    {
+      "status": 3000,
+      "message": "No sale IDs supplied"
+    }
+
+json error response BAD_INPUT
+
+    {
+      "status": 3000,
+      "message": "Invalid input; items must be a comma-separated list of sale IDs"
+    }
+
+json error response BAD_INPUT
+
+    {
+      "status": 3000,
+      "message": "300 sale IDs supplied; only up to 100 may be supplied at one time"
+    }
+
+json error response GENERIC_INTERNAL_ERROR
+
+    {
+      "status": 2000,
+      "message": "An unknown error occurred"
+    }
+    
+##<a name='ReturnItems'>ReturnItems(`array` items)</a>
+
+Return one or more items you've listed for sale to your Steam accounts. Input items must be either on sale or awaiting return, and must not have an active trade offer out or queued. Under most circumstances, a trade offer won't be queued, but it's possible if, for example, you request that an item be returned and the bot is offline at the time of request.
+
+This will (attempt to) send trade offers for all items in your input. If multiple trade offers must be sent, they will be sent in series. Therefore, you may wish to call this method separately for each bot that will be sending an offer (you can use GetSales to find out which bot is holding which item).
+
+If the `status` is not OK (1), the output will still be defined (if your input was well-formed, there were no unexpected internal errors, and Steam is not completely down) in the event that the failure was due to Steam (e.g. bad trade URL, item doesn't exist anymore, trade server down).
+
+Input:
+
+ * `items` An array of sale IDs of items you want returned
+ 
+Output:
+
+ * `offers` An array of objects, where each object in this array represents one trade offer that we sent (or tried to send)
+ * `bot_id` The internal ID of the bot that sent (or tried to send) this trade offer
+ * `items` An array of sale IDs which were in this offer
+ * `tradeoffer_id` If the offer was successfully sent, this is its trade offer ID as a string. `null` on failure
+ * `tradeoffer_error` If the offer couldn't be sent, this is an error message. `null` on success
+ 
+#Errors
+
+    {
+      "status": 4000,
+      "message": "Steam servers are currently unavailable. Please try again later."
+    }
+
+json error response BAD_INPUT
+
+    {
+      "status": 3000,
+      "message": "Bad input for items"
+    }
+
+json error response NOT_FOUND
+
+    {
+      "status": 2002,
+      "message": "One or more input items were not found."
+    }
+
+json error response NOT_FOUND
+
+    {
+      "status": 2002,
+      "message": "No matching sale was found for ID ..."
+    }
+
+json error response BAD_STATE
+
+    {
+      "status": 2003,
+      "message": "Sale ID ... is not in a returnable state."
+    }
+
+json error response BAD_STATE
+
+    {
+      "status": 2003,
+      "message": "There was a problem with sale ID ... . Please contact support to resolve this issue."
+    }
+    
+json error response STEAM_OFFER_FAILURE
+
+    {
+      "status": 4004,
+      "message": "There was a problem sending some of your trade offers. Please try again later."
+    }
+    
+## <a name='GetActiveTradeOffers'>GetActiveTradeOffers()</a>
+
+Get the list of active trade offers which our bots have sent you.
+
+Output:
+
+ * `offers` An object whose keys are Steam trade offer IDs, and values are objects each with this structure:
+     * `saleids` An array containing the OPSkins sale IDs of the items in this offer
+     * `bot_id` The internal OPSkins ID of the bot which sent this trade
+     * `bot_id64` The 64-bit SteamID of the bot which sent this trade
+     * `type` A string, which may be one of pickup, return, or withdrawal
+     
+## <a name='Search'>Search(`string` app, optional `string` search_item)</a>
+     
+Search active OPSkins listings for particular items. This endpoint is relatively heavily rate-limited. Currently, it is limited to 20 requests per minute. To prevent bot sniping, this endpoint will only return listings which have been publicly visible for at least ten minutes, and are not currently limited to Buyers Club members. This endpoint always returns 100 listings sorted from lowest to highest price.
+
+Input is identical to that of the main site's search page. The most important parameters are listed here.

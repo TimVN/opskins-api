@@ -30,6 +30,9 @@ module.exports = (apiKey) => {
         GetActiveTradeOffers: () => {
             return opRequest.make('ISales/GetActiveTradeOffers/v1');
         },
+        Search: () => {
+
+        },
         GetLastSales: (params = {}) => {
             return new Promise((resolve, reject) => {
                 opRequest.validate(['appid', 'contextid', 'market_name'], params).then(async () => {
