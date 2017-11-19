@@ -1,6 +1,6 @@
 {
   "name": "opskins-api",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "description": "Module used to interact with the OPSkins API",
   "main": "index.js",
   "scripts": {
@@ -15,5 +15,15 @@
   "dependencies": {
     "request": "^2.83.0",
     "request-promise": "^4.2.2"
-  }
+  },
+  "git": "https://github.com/TimVN/opskins-api",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimVN/opskins-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TimVN/opskins-api/issues"
+  },
+  "homepage": "https://github.com/TimVN/opskins-api#readme"
 }

@@ -1,3 +1,5 @@
+
+
 npm i opskins-api
 
 `const OPSkins = new (require('opskins-api'))(your OPSkins API Key)`
@@ -24,6 +26,10 @@ Example:
     });
 
 <a name='GetAddress'>GetAddress(`string` processor)</a>
+
+Input:
+
+ * `processor` The processor you need the address for
 
 Processor can be:
 
@@ -53,6 +59,10 @@ Output:
  
 ##<a name='CancelPendingCashout'>CancelPendingCashout(`int` cashoutId)</a>
 
+Input:
+
+ * `cashoutid` The id of the cashout to cancel 
+
 Outputs nothing
 
 ##<a name='GetBitcoinInstantCashoutRate'>GetBitcoinInstantCashoutRate()</a>
@@ -62,6 +72,8 @@ Output:
  * `usd_rate` The price per 1 BTC, in USD (dollars, not cents)
 
 ##<a name='RequestPayPal'>RequestPayPal(`int` amount, `int` priority)</a>
+
+Input:
 
  * `amount` is in USD cents.
  * `priority` optional, 0 by default. Pass `1` if you want this to be a priority cashout (incurs extra 5% fee). Leave blank if you want a regular cashout
@@ -73,6 +85,8 @@ Output:
  * `priority` A boolean indicating whether this cashout request is for a priority cashout
  
 ##<a name='RequestBitcoin'>RequestBitcoin(`int` amount, `int` priority)</a>
+
+Input:
 
  * `amount` is in USD cents.
  * `priority` optional, 0 by default. Pass `1` if you want this to be a priority cashout (incurs extra 5% fee). Leave blank if you want a regular cashout
@@ -86,6 +100,8 @@ Output:
  * `bitcoin_amount_satoshis` Only present if this was an instant cashout. This is the amount of BTC you received, in satoshis (0.00000001 BTC)
  
 ##<a name='RequestSkrill'>RequestSkrill(`int` amount)</a>
+
+Input:
 
  * `amount` is in USD cents.
  
@@ -118,6 +134,8 @@ Example:
 
 ##<a name='GetInventory'>GetInventory(`int` page, `int` per_page)</a>
 
+Input:
+
  * `page` starts at 0
  * `per_page` is optional, and defaults to 10,000
  
@@ -137,6 +155,8 @@ Output:
     
 ##<a name='Withdraw'>Withdraw(`string` items)</a>
 
+Input:
+
  * `items` array of item IDs. Must be items in your OPSkins inventory that do not have an outstanding trade offer and do not require support.
  
 Output:
@@ -150,6 +170,8 @@ Output:
 ##<a name='Deposit'>Deposit(`string` items)</a>
 
 Add between 1 and 50 items (upper cap subject to change) to your On-Site Inventory. This will fail if any of the items passed in already have sales with active trade offers out. If there's a matching sale for an item that doesn't have a trade offer out, it will automatically be deleted. This works identically to ISales/ListItems/v1 minus the price and addons parameters.
+
+Input:
 
  * `items` A JSON-encoded array of objects. One object for each item you wish to list. Each object should contain these properties:
     * `appid` The Steam AppID of the game which owns this item (e.g. 730 for CS:GO, 440 for TF2, 570 for Dota 2)
@@ -184,6 +206,8 @@ Example:
     
 ##<a name='GetPriceList'>GetPriceList(`int` appid)</a>
 
+Input:
+
  * `appid` The Steam application ID of the app you want prices for. For example, 730 for CS:GO, 440 for TF2, or 753 for Steam.
  
 Output:
@@ -201,6 +225,8 @@ Output:
 The output of this method is cached by OPSkins' CDN. Therefore, the timestamp is most likely not going to be accurate. This list updates nightly at or around midnight server time (Eastern United States timezone).
 
 ##<a name='GetAllLowestListPrices'>GetAllLowestListPrices(`int` appid)</a>
+
+Input:
 
  * `appid` The Steam application ID of the app you want prices for. For example, 730 for CS:GO, 440 for TF2, or 753 for Steam.
  
@@ -232,6 +258,8 @@ Because `options` can contain a bunch of optional parameters, it is an object, p
         page: 2,
         sort: 'new'
     }
+    
+Input:
 
  * `type` Optional. If provided, limit results to sales in this status. If not provided, return all sale statuses.
     1. - Awaiting pickup; you created a listing but haven't deposited the item yet. The item may also be in a trade hold or trade locked.
@@ -299,3 +327,57 @@ Output:
  * `featured` - The item has been featured
  * `private` - The item has been listed privately
  * `screenshots` - The item has an Instant Field Inspection
+ 
+##<a name='GetListingLimit'>GetListingLimit()</a>
+
+Get the current limit of how many items you can list for sale in one request. This limit is subject to change periodically (usually it only goes up, but it is possible that we may need to decrease it at some point). This is not an account-based listing limit; this is only a limit on how many items can be listed in one sale queue (via the website) or one call to ListItems (via the API).
+
+Output:
+
+ * `listing_limit` The current listing limit
+ 
+##<a name='ListItems'>ListItems()</a>
+
+Lists between 1 and 50 items for sale (upper cap subject to change). This will fail if any of the items passed in already have sales with active trade offers out. If there's a matching sale for an item that doesn't have a trade offer out, it will automatically be deleted.
+
+Input:
+
+ * `items` A JSON-encoded array of objects. One object for each item you wish to list. Each object should contain these properties:
+     * `appid` The Steam AppID of the game which owns this item (e.g. 730 for CS:GO, 440 for TF2, 570 for Dota 2)
+     * `contextid` The Steam context ID which contains this item (2 for Valve games, 6 for Steam Community items, 1 for H1Z1, etc.). When you right-click on an item in your Steam inventory and copy its URL, the context ID is the second number after the hash.
+     * `assetid` The Steam asset ID of the item. This is also known as just the item's `id`
+     * `price` The desired list price for this item, before commission. Pass this in USD cents (formerly known as OP). For example, $20.00 is 2000.
+     * `addons` An array of strings (possible addon strings are listed below)
+     * `featured` - Feature this item (costs $3.00 if you don't have a free featured credit available)
+     * `screenshots` - Inspectable CS:GO items only: take screenshots of this item and display them (Instant Field Inspection). Costs 2% of list price, minimum $0.50. If you also feature this item, then the total cost of both addons is capped to $4.50.
+     
+Output:
+
+ * `tradeoffer_id` If a trade offer was successfully sent, this is its ID as a string. If we weren't able to send a trade offer, this is `null`
+ * `tradeoffer_error` If we weren't able to send a trade offer, this is an error message string. If there was no error, this is `null`
+ * `bot_id` The internal OPSkins ID of the storage account to which these sales were assigned.
+ * `bot_id64` The 64-bit SteamID of the storage account to which these sales were assigned. This is the account that's sending a trade offer.
+ * `security_token` The 6-character security token that is included in the trade offer message.
+ * `sales` An array containing objects describing the sales that were created. Each object has these properties:
+     * `saleid` The OPSkins internal ID of this sale
+     * `appid` The Steam AppID for this item
+     * `contextid` The Steam context ID in which this item resides in your inventory
+     * `assetid` The current asset ID of this item in your inventory
+     * `market_name` The name of this item
+     * `price` The list price of this item in USD cents
+     * `addons` An array containing strings for each addon this item has
+     
+##<a name='EditPrice'>EditPrice()</a>
+
+Edits the price of an item you currently have listed. If the item is in your OPSkins inventory, it lists it for sale.
+
+Input:
+
+ * `saleid` The ID of the sale/item you want to edit the price for (must be yours)
+ * `price` The new price for your item, in USD cents. For example, to list an item for $4.00, use `400`
+ 
+Output:
+
+ * `relisted` true if the item was in your OPSkins inventory and has been re-listed, or false if it was already listed and its price has simply been edited.
+ 
+ ###Errors
