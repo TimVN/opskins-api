@@ -1,8 +1,8 @@
-
-
 npm i opskins-api
 
 `const OPSkins = new (require('opskins-api'))(your OPSkins API Key)`
+
+For more help and documentation regarding the OPSkins API, visit [their official API docs](https://opskins.com/kb/api-v2)
 
  * [Cashout](#cashout-methods)
  * [Inventory](#inventory-methods)
