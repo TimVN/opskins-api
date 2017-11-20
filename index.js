@@ -14,6 +14,12 @@ class OPSkins {
         this.Test = () => {
             return this.opRequest.make('ITest/TestAuthed/v1');
         };
+        this.CallsLeft = () => {
+            return new Promise(async (resolve, reject) => {
+                let call = await this.opRequest.full('ITest/TestAuthed/v1');
+                resolve(call.headers['x-queries-remaining'] ? call.headers['x-queries-remaining'] : 0);
+            });
+        };
     }
 }
 

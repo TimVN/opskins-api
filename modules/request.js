@@ -6,7 +6,6 @@ class OPRequest {
     }
 
     make(uri, form = {}, method = 'get', excludeApiKey = false) {
-        console.log(`Requesting`, 'https://api.opskins.com/' + uri + '/?key=' + this.apiKey);
         if (!excludeApiKey) {
             form.key = this.apiKey;
         }
@@ -19,6 +18,21 @@ class OPRequest {
             default:
                 return request('https://api.opskins.com/' + uri + '/' + this.serialize(form), {json: true});
         }
+    }
+
+    full(uri, form = {}, method = 'get', excludeApiKey = false) {
+        if (!excludeApiKey) {
+            form.key = this.apiKey;
+        }
+
+        return new Promise((resolve, reject) => {
+            request({
+                uri: 'https://api.opskins.com/' + uri + '/' + this.serialize(form),
+                resolveWithFullResponse: true
+            }).then(result => {
+                resolve(result);
+            });
+        });
     }
 
     validate(req, params) {
