@@ -4,8 +4,6 @@ npm i opskins-api
 
 `const OPSkins = new (require('opskins-api'))(your OPSkins API Key)`
 
-#Categories#
-
  * [Cashout](#cashout-methods)
  * [Inventory](#inventory-methods)
  * [Pricing](#pricing-methods)
