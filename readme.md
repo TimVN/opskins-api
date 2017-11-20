@@ -15,7 +15,7 @@ npm i opskins-api
  * [User](#user-methods)
 
 #Methods
-## <a name='cashout-methods'>Cashout</a>
+# <a name='cashout-methods'>Cashout</a>
 
 !! These methods are used accessing the 'Cashout' property !!
 
@@ -122,7 +122,7 @@ Output:
  * `deposited_balance` How much of your balance was deposited through a payment provider, in USD cents. This amount cannot be cashed out.
  * `cashoutable_balance` The total amount of money you have that can be cashed out, in USD cents. This is your `total_balance` minus your `pending_cashout_balance` and your `deposited_balance`
  
-## <a name='inventory-methods'>Inventory</a>
+# <a name='inventory-methods'>Inventory</a>
 
 !! These methods are used accessing the 'Inventory' property !!
 
@@ -194,7 +194,7 @@ Output:
      * `price` The list price of this item in USD cents (typically set to $99,999.99)
      * `addons` An array containing strings for each addon this item has
      
-## <a name='pricing-methods'>Pricing</a>
+# <a name='pricing-methods'>Pricing</a>
 
 !! These methods are used accessing the 'Pricing' property !!
 
@@ -239,7 +239,7 @@ Output:
    
 The proper way to interpret an entry is "quantity currently on sale, starting at price".
 
-## <a name='sales-methods'>Sales</a>
+# <a name='sales-methods'>Sales</a>
 
 !! These methods are used accessing the 'Sales' property !!
 
@@ -594,8 +594,257 @@ Output:
      * `bot_id64` The 64-bit SteamID of the bot which sent this trade
      * `type` A string, which may be one of pickup, return, or withdrawal
      
-## <a name='Search'>Search(`string` app, optional `string` search_item)</a>
+## <a name='Search'>Search(`string` app, *optional* `string` search_item, *optional* `float` min, *optional* `float` max )</a>
      
 Search active OPSkins listings for particular items. This endpoint is relatively heavily rate-limited. Currently, it is limited to 20 requests per minute. To prevent bot sniping, this endpoint will only return listings which have been publicly visible for at least ten minutes, and are not currently limited to Buyers Club members. This endpoint always returns 100 listings sorted from lowest to highest price.
 
 Input is identical to that of the main site's search page. The most important parameters are listed here.
+
+ * `app` Required. This is the appid_contextid pair for the app you wish to search. For example, use `730_2` to search CS:GO listings.
+ * `search_item` Optional. This is the search term which will be matched to item names. This uses fuzzy matching by default. Wrap your term in quotes to only return exact matches. For example, to find items containing the exact string "case key" (case-insensitive), then this value should be `"case key"`.
+ * `min` Optional. The minimum item price to return, in USD. Note that this is different from most other currency displays which use USD cents. For example, pass `0.5` here to only search for items priced at $0.50 and up.
+ * `max` Optional. The maximum item price to return, in USD.
+ 
+Output:
+ 
+ * `sales` An array of objects containing the results of your search query. Each object has these properties:
+     * `id` The item's OPSkins sale ID
+     * `amount` The item's list price, in USD cents
+     * `classid` The item's Steam classid at time of pickup (may have changed in trade)
+     * `instanceid` The item's Steam instanceid at time of pickup (may have changed in trade)
+     * `img` The item's Steam image URL (append this to https://steamcommunity-a.akamaihd.net/economy/image/)
+     * `market_name` The item's name
+     * `inspect` The full URL to inspect this item, if applicable. If not, then this is null
+     * `type` The item's "type" as reported by Steam (e.g. Base Grade Key)
+     * `item_id` The item's Steam asset ID on our storage account
+     * `stickers` A string containing the stickers applied to this item, as comma-separated pairs of stickerid,wear
+     * `wear` The item's floating-point wear value, between 0 and 1 if applicable. If not applicable or unknown, then null
+     * `appid` The item's Steam appID
+     * `contextid` The item's Steam context ID
+     * `bot_id` The internal OPSkins ID of the bot which is holding this item
+     
+Errors:
+
+json error response RATE_LIMIT_EXCEEDED
+
+    {
+      "status": 3008,
+      "message": "You already have a search request pending. Please wait for it to finish."
+    }
+
+json error response NOT_LOGGED_IN
+
+    {
+      "status": 1003,
+      "message": "Please log in to view more results."
+    }
+
+json error response ACCESS_DENIED
+
+    {
+      "status": 1002,
+      "message": "Please increase your Steam profile level to :min_buy_level to view more results."
+    }
+    
+## <a name='BuyItems'>BuyItems(`array` saleids, `int` total)</a>
+
+Purchase one or more items and deliver them to your OPSkins inventory. Once purchased, the item(s) can be delivered to your Steam inventory using [IInventory/Withdraw](#Withdraw). To prevent bot sniping, this endpoint will only purchase listings which have been publicly visible for at least ten minutes, and are not currently limited to Buyers Club members.
+
+If this request succeeds, then it will contain a root-level `balance` property containing your new account balance after the purchase, in USD cents.
+
+Input:
+
+ * `saleids` An array of sale IDs for the items you wish to purchase. 300 maximum.
+ * `total` The total cost of these items, in USD cents. For example, if you are purchasing a $2 item and a $1.23 item, then this should be 323. The request will fail if this does not match the actual total.
+
+Output:
+
+ * `items` An array of objects for the items you purchased. Each object has these properties:
+     * `saleid` The OPSkins sale ID of the item. This will be one of the IDs you passed in your request.
+     * `new_itemid` The new OPSkins ID of the item in your OPSkins inventory. This is the ID you will pass to Withdraw in order to withdraw the item to your Steam inventory. This will become the item's sale ID if you choose to re-list it.
+     * `name` The name of the item
+     * `bot_id` The internal OPSkins ID of the bot which is holding this item
+     
+#Errors
+
+json error response STEAM_UNAVAILABLE
+
+    {
+      "status": 4000,
+      "message": "Steam servers are currently unavailable"
+    }
+
+json error response BAD_INPUT
+
+    {
+      "status": 3000,
+      "message": "Duplicate sale ID ..."
+    }
+
+json error response BAD_INPUT
+
+    {
+      "status": 3000,
+      "message": "Non-numeric sale ID ..."
+    }
+
+json error response RATE_LIMIT_EXCEEDED
+
+    {
+      "status": 3008,
+      "message": "Maximum of 300 items in request exceeded"
+    }
+
+json error response RATE_LIMIT_EXCEEDED
+
+    {
+      "status": 3008,
+      "message": "You must wait until your previous purchase attempt completes"
+    }
+
+json error response NOT_FOUND
+
+    {
+      "status": 2002,
+      "message": "Invalid sale ID provided"
+    }
+
+json error response BAD_STATE
+
+    {
+      "status": 2003,
+      "message": "Expected total ... does not match actual total ..."
+    }
+
+json error response UNACCEPTABLE_ITEM
+
+    {
+      "status": 3001,
+      "message": "Sale ... cannot be purchased as it is currently restricted to Buyers Club members."
+    }
+
+json error response NOT_ENOUGH_COINS
+
+    {
+      "status": 1001,
+      "message": "You do not have enough wallet funds to complete this transaction."
+    }
+
+json error response BAD_STATE
+
+    {
+      "status": 2003,
+      "message": "Sale ... is no longer available for purchase."
+    }
+
+json error response GENERIC_INTERNAL_ERROR
+
+    {
+      "status": 2000,
+      "message": "An unknown error occurred."
+    }
+    
+## <a name='GetLastSales'>GetLastSales(`int` appid, `int` contextid, `string` market_name, *optional* `string` val_1)</a>
+
+Get data about the most recent sales for a given item.
+
+Input:
+
+ * `appid` The Steam AppID of the game which owns the item you're interested in
+ * `contextid` The Steam context ID for the item you're interested in
+ * `market_name` The full market name of the item you're interested in, for example: "AK-47 | Aquamarine Revenge (Field-Tested)"
+ * `val_1` If you're interested in a particular variant of the item, this is its unusual effect index (for TF2) or pattern/paint index (for CS:GO)
+ 
+Output:
+
+The `response` of this method is an array of objects, where each object has these properties:
+
+ * `id` The sale ID of the item that sold
+ * `amount` The amount the item sold for, in USD cents
+ * `wear` The item's wear as a float, or null if unknown or not applicable
+ * `timestamp` The Unix timestamp of when this item sold
+ 
+## <a name='GetSaleStatuses'>GetSaleStatuses()</a>
+
+Output:
+
+ * `statuses` An array containing objects, where each object has the following properties
+ * `key` The integer code that corresponds to this sale state
+ * `name` The localized string that corresponds to this sale state
+ 
+# <a name='status-methods'>Status</a>
+
+!! These methods are used accessing the 'Status' property !!
+
+Example:
+
+    OPSkins.Status.GetBotList().then(data => {
+        console.log(data);
+    });
+
+## <a name='GetSaleStatuses'>GetSaleStatuses()</a>
+
+Retrieves a listing of all active OPSkins bots, namely their internal IDs (the number in their Steam name), their SteamIDs, and their online status.
+
+You may wish to note that some internal IDs have either been skipped or retired, so this list is not exactly sequential.
+
+Output:
+
+ * `bots` An object whose keys are internal bot IDs and values are objects with this structure:
+ * `id` The bot's internal ID
+ * `id64` The bot's 64-bit SteamID as a string
+ * `online` A boolean indicating whether this bot is currently online and available for trading
+ 
+# <a name='support-methods'>Support</a>
+
+!! These methods are used accessing the 'Support' property !!
+
+Example:
+
+    OPSkins.Support.RepairItem(1337).then(data => {
+        console.log(data);
+    });
+    
+## <a name='RepairItem'>RepairItem(`int` saleid)</a>
+
+Input:
+
+ * `saleid` - The ID of the sale (or on-site inventory item) that you want to attempt to repair
+ 
+Output:
+
+ * `type` - A string representing what type of item this is in your account
+     * `sale` for an item you're selling
+     * `purchase` for an item you purchased
+     * `item` for an item in your OPSkins inventory
+ * `bot` - The ID of the bot which owns this item
+ * `repairedSaleids` - An array containing the IDs of other items on this bot which are also repaired (will contain the passed-in ID if it was repaired). Some or all of these may not belong to you.
+ * `repaired` - 1 if the passed-in ID was repaired, 0 if it wasn't. You'll need to contact support if it's 0. Will also be 1 if the passed-in ID was not in a bad state to begin with.
+ 
+# <a name='user-methods'>User</a>
+
+!! These methods are used accessing the 'User' property !!
+
+Example:
+
+    OPSkins.User.GetBalance().then(data => {
+        console.log(data);
+    });
+    
+## <a name='GetBalance'>GetBalance()</a>
+
+Used to get the current balance of your OPSkins account.
+
+Output:
+
+None beyond the standard balance property, as defined in the [API overview](https://opskins.com/kb/api-v2#responses).
+
+## <a name='SaveTradeURL'>SaveTradeURL(`string` trade_url)</a>
+
+Update your account's trade URL.
+
+Input:
+
+ * `trade_url` Your new trade URL. Must be for the Steam account linked with this OPSkins account, or else will be rejected.
+
+Outputs nothing

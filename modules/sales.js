@@ -30,8 +30,11 @@ module.exports = (apiKey) => {
         GetActiveTradeOffers: () => {
             return opRequest.make('ISales/GetActiveTradeOffers/v1');
         },
-        Search: () => {
-
+        Search: (app, search_item = '', min = 0, max = 100000) => {
+            return opRequest.make('ISales/Search/v1', { app: app, search_item: search_item, min: min, max: max });
+        },
+        BuyItems: (saleIds, total) => {
+            return opRequest.make('ISales/BuyItems/v1', { saleids: saleIds.join(','), total: total }, 'post');
         },
         GetLastSales: (params = {}) => {
             return new Promise((resolve, reject) => {
