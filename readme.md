@@ -14,7 +14,6 @@ npm i opskins-api
  * [Support](#support-methods)
  * [User](#user-methods)
 
-#Methods
 # <a name='cashout-methods'>Cashout</a>
 
 !! These methods are used accessing the 'Cashout' property !!
