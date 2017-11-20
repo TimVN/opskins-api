@@ -263,12 +263,12 @@ Because `options` can contain a bunch of optional parameters, it is an object, p
 Input:
 
  * `type` Optional. If provided, limit results to sales in this status. If not provided, return all sale statuses.
-    1. Awaiting pickup; you created a listing but haven't deposited the item yet. The item may also be in a trade hold or trade locked.
-    2. On sale
-    3. Sold, but not delivered to the buyer yet
-    4. Sold and delivered. You have been paid at this point.
-    5. You requested that the item be returned, but it hasn't been delivered to you yet.
-    6. The item has been returned to your account.
+    1. 1 Awaiting pickup; you created a listing but haven't deposited the item yet. The item may also be in a trade hold or trade locked.
+    2. 2 On sale
+    3. 3 Sold, but not delivered to the buyer yet
+    4. 4 Sold and delivered. You have been paid at this point.
+    5. 5 You requested that the item be returned, but it hasn't been delivered to you yet.
+    6. 6 The item has been returned to your account.
  * `appid` Optional. If provided, limit results to sales for this Steam AppID. If not provided, return all apps.
  * `after_saleid` Optional. If provided, limit results to sales with IDs greater than this.
  * `page` Optional. Page number to request. Defaults to 1.
