@@ -4,6 +4,8 @@ npm i opskins-api
 
 For more help and documentation regarding the OPSkins API, visit [their official API docs](https://opskins.com/kb/api-v2)
 
+Please not that every method in this module returns a promise!
+
  * [Cashout](#cashout-methods)
  * [Inventory](#inventory-methods)
  * [Pricing](#pricing-methods)
