@@ -6,18 +6,28 @@ class OPRequest {
     }
 
     make(uri, form = {}, method = 'get', excludeApiKey = false) {
-        if (!excludeApiKey) {
-            form.key = this.apiKey;
-        }
+        return new Promise((resolve, reject) => {
+            if (!excludeApiKey) {
+                form.key = this.apiKey;
+            }
 
-        switch(method) {
-            case 'post':
-                return request.post('https://api.opskins.com/' + uri, { form: form, json: true});
-                break;
+            switch (method) {
+                case 'post':
+                    request.post('https://api.opskins.com/' + uri, {form: form, json: true}).then(data => {
+                        resolve(data.response || data);
+                    }).catch(e => {
+                        reject(e.message);
+                    });
+                    break;
 
-            default:
-                return request('https://api.opskins.com/' + uri + '/' + this.serialize(form), {json: true});
-        }
+                default:
+                    request('https://api.opskins.com/' + uri + '/' + this.serialize(form), {json: true}).then(data => {
+                        resolve(data.response || data);
+                    }).catch(e => {
+                        reject(e.error);
+                    });
+            }
+        });
     }
 
     full(uri, form = {}, method = 'get', excludeApiKey = false) {
