@@ -12,7 +12,7 @@ module.exports = (apiKey) => {
             return opRequest.make('ISales/ListItems/v1', { items: items }, 'post');
         },
         EditPrice: (saleId, price) => {
-            return opRequest.make('ISales/ListItems/v1', { saleid: saleId, price: price }, 'post');
+            return opRequest.make('ISales/EditPrice/v1', { saleid: saleId, price: price }, 'post');
         },
         EditPriceMulti: (items) => {
             let tmp = {};
