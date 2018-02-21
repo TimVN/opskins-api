@@ -3,7 +3,7 @@ module.exports = (apiKey) => {
 
     return {
         RepairItem: (saleId) => {
-            return opRequest.make('ISupport/RepairItem/v1', { saleid: saleId });
+            return opRequest.make('ISupport/RepairItem/v1', { saleid: saleId }, 'post');
         }
     }
 };
