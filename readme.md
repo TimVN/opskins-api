@@ -238,6 +238,19 @@ Output:
    
 The proper way to interpret an entry is "quantity currently on sale, starting at price".
 
+## <a name='GetSuggestedPrices'>GetSuggestedPrices(`int` appid)</a>
+
+Input:
+
+ * `appid` The Steam application ID of the app you want prices for. For example, 730 for CS:GO, 440 for TF2, or 753 for Steam.
+ 
+Output:
+
+`response` is an object whose keys are item names. Prices are in USD cents (formerly known as OP). The properties are:
+
+ * op_7_day
+ * op_30_day
+ 
 # <a name='sales-methods'>Sales</a>
 
 !! These methods are used accessing the 'Sales' property !!

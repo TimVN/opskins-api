@@ -3,10 +3,13 @@ module.exports = (apiKey) => {
 
     return {
         GetPriceList: (appId) => {
-            return opRequest.make('IPricing/GetPriceList/v2', { appid: appId }, null, true);
+            return opRequest.make('IPricing/GetPriceList/v2', {appid: appId}, null, true);
         },
         GetAllLowestListPrices: (appId) => {
-            return opRequest.make('IPricing/GetAllLowestListPrices/v1', { appid: appId }, null, true);
-        }
+            return opRequest.make('IPricing/GetAllLowestListPrices/v1', {appid: appId}, null, true);
+        },
+        GetSuggestedPrices: (appId) => {
+            return opRequest.make('IPricing/GetSuggestedPrices/v2', {appid: appId}, null, true);
+        },
     }
 };
