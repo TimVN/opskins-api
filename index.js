@@ -12,6 +12,7 @@ class OPSkins {
         this.Support = require('./modules/support')(apiKey);
         this.Inventory = require('./modules/inventory')(apiKey);
         this.Transactions = require('./modules/transactions')(apiKey);
+        this.Auth = require('./modules/oauth')(apiKey);
         this.Test = () => {
             return this.opRequest.make('ITest/TestAuthed/v1');
         };
